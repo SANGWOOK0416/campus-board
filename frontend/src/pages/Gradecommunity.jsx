@@ -17,7 +17,7 @@ const GradeBoard = () => {
 
   useEffect(() => {
     setLoading(true);
-    getPosts({ page, limit: 15 })
+    getPosts({ page, limit: 15, board_id: 'grade' })
       .then(data => {
         setPosts(data.posts);
         setTotalPages(data.totalPages);

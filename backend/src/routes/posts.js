@@ -37,17 +37,92 @@ router.get('/', async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
 
     // is_deleted가 false인 정상 게시글만 최신순으로 가져오기
-    const posts = await Post.find({ is_deleted: false })
+    const filter = { is_deleted: false };
+    if (req.query.board_id) filter.board_id = req.query.board_id;
+
+    const posts = await Post.find(filter)
       .limit(limit)
       .skip((page - 1) * limit)
       .populate('user_id', 'name major grade') // 작성자의 이름, 전공, 학년 정보 포함
       .sort({ created_at: -1 });
 
-    const total = await Post.countDocuments({ is_deleted: false });
+    const total = await Post.countDocuments(filter);
     
     res.status(200).json({ posts, total, page, totalPages: Math.ceil(total / limit) });
   } catch (error) {
     res.status(500).json({ message: '게시글 목록을 불러오지 못했습니다.', error: error.message });
+  }
+});
+
+// Read: 내가 작성한 게시글 조회 (인증 필요) — /:id 보다 먼저 선언
+
+router.get('/my', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findOne({ auth0_id: req.auth.payload.sub });
+    if (!user) return res.status(401).json({ message: 'DB에 등록되지 않은 사용자입니다.' });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const filter = { is_deleted: false, user_id: user._id };
+
+    const [posts, total] = await Promise.all([
+      Post.find(filter).sort({ created_at: -1 }).skip((page - 1) * limit).limit(limit),
+      Post.countDocuments(filter),
+    ]);
+
+    res.status(200).json({ posts, total, page, totalPages: Math.ceil(total / limit) });
+  } catch (error) {
+    res.status(500).json({ message: '게시글 조회에 실패했습니다.', error: error.message });
+  }
+});
+
+// Read: 내가 작성한 댓글 목록 (인증 필요)
+
+router.get('/my/comments', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findOne({ auth0_id: req.auth.payload.sub });
+    if (!user) return res.status(401).json({ message: 'DB에 등록되지 않은 사용자입니다.' });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+
+    const [comments, total] = await Promise.all([
+      Comment.find({ user_id: user._id, is_deleted: false })
+        .populate({ path: 'post_id', select: 'title board_id' })
+        .sort({ created_at: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Comment.countDocuments({ user_id: user._id, is_deleted: false }),
+    ]);
+
+    res.status(200).json({ comments, total, page, totalPages: Math.ceil(total / limit) });
+  } catch (error) {
+    res.status(500).json({ message: '댓글 목록 조회에 실패했습니다.', error: error.message });
+  }
+});
+
+// Read: 내가 좋아요한 게시글 목록 (인증 필요)
+
+router.get('/my/likes', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findOne({ auth0_id: req.auth.payload.sub });
+    if (!user) return res.status(401).json({ message: 'DB에 등록되지 않은 사용자입니다.' });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+
+    const [likes, total] = await Promise.all([
+      Like.find({ user_id: user._id })
+        .populate({ path: 'post_id', select: 'title board_id created_at like_count' })
+        .sort({ created_at: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Like.countDocuments({ user_id: user._id }),
+    ]);
+
+    res.status(200).json({ likes, total, page, totalPages: Math.ceil(total / limit) });
+  } catch (error) {
+    res.status(500).json({ message: '좋아요 목록 조회에 실패했습니다.', error: error.message });
   }
 });
 
@@ -156,13 +231,27 @@ const Comment = require('../models/Comment');
 const Like = require('../models/Like');
 const { notifyNewComment } = require('../notifications/sseManager');
 
+// 댓글 목록 조회
+
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const comments = await Comment.find({ post_id: req.params.id, is_deleted: false })
+      .populate('user_id', 'name')
+      .sort({ created_at: 1 });
+    res.status(200).json(comments);
+  } catch (error) {
+    res.status(500).json({ message: '댓글 목록 조회에 실패했습니다.', error: error.message });
+  }
+});
+
 // 댓글 작성 (Auth0 인증 필요)
 
 router.post('/:id/comments', authMiddleware, async (req, res) => {
   try {
     const user = await User.findOne({ auth0_id: req.auth.payload.sub });
-    const post = await Post.findById(req.params.id);
+    if (!user) return res.status(401).json({ message: 'DB에 등록되지 않은 사용자입니다.' });
 
+    const post = await Post.findById(req.params.id);
     if (!post || post.is_deleted) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
 
     const newComment = new Comment({
@@ -190,8 +279,9 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
 router.post('/:id/like', authMiddleware, async (req, res) => {
   try {
     const user = await User.findOne({ auth0_id: req.auth.payload.sub });
-    const post = await Post.findById(req.params.id);
+    if (!user) return res.status(401).json({ message: 'DB에 등록되지 않은 사용자입니다.' });
 
+    const post = await Post.findById(req.params.id);
     if (!post || post.is_deleted) return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
 
     // 이미 좋아요를 눌렀는지 확인

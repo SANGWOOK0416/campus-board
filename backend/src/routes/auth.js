@@ -32,14 +32,13 @@ router.post('/sync', authMiddleware, async (req, res) => {
     let user = await User.findOne({ auth0_id: auth0_id });
 
     if (!user) {
-      // [수정된 부분] 내 DB에 없으면 새로 가입할 때 필수 정보들을 다 넣어서 생성
-      user = new User({ 
-        auth0_id: auth0_id,
-        email: email,
-        name: name,
-        major: major,
-        grade: grade,
-        student_id: student_id
+      user = new User({
+        auth0_id,
+        email:      email      || null,
+        name:       name       || '',
+        major:      major      || '',
+        grade:      grade      || null,
+        student_id: student_id || null,
       });
       await user.save();
       console.log('✅ [Sync] 새로운 유저 DB 등록 완료!');

@@ -17,11 +17,11 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   auth0_id: { type: String, required: true, unique: true }, // Auth0 고유 식별자 (sub)
-  student_id: { type: String, required: true, unique: true }, // 학번
-  name: { type: String, required: true },
-  grade: { type: Number, required: true }, // 학년
-  major: { type: String, required: true }, // 전공
-  email: { type: String, required: true, unique: true },
+  student_id: { type: String, default: null }, // 학번 (선택)
+  name: { type: String, default: '' },
+  grade: { type: Number, default: null }, // 학년 (선택)
+  major: { type: String, default: '' }, // 전공 (선택)
+  email: { type: String, default: null }, // 이메일 (선택)
   role: { type: String, enum: ['user', 'admin'], default: 'user' } // admin/user 구분
 }, { 
   timestamps: { createdAt: 'created_at', updatedAt: false } // 발표 자료 명세 준수함

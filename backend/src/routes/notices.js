@@ -14,10 +14,15 @@ router.get('/', async (req, res) => {
     if (req.query.department) {
       filter.department = req.query.department;
     }
+    if (req.query.is_pinned === 'true') {
+      filter.is_pinned = true;
+    } else if (req.query.is_pinned === 'false') {
+      filter.is_pinned = { $ne: true };
+    }
 
     const [notices, total] = await Promise.all([
       Notice.find(filter)
-        .sort({ crawledAt: -1 })
+        .sort({ is_pinned: -1, created_at: -1 })
         .skip(skip)
         .limit(limit),
       Notice.countDocuments(filter)
