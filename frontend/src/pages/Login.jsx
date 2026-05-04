@@ -1,14 +1,19 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. useNavigate 임포트
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import logImg from '../assets/logimg.jpg';
 import donggukLogo from '../assets/logo.png';
 
 const LoginPage = () => {
-  const navigate = useNavigate(); // 2. navigate 함수 생성
+  const navigate = useNavigate();
 
   const handleSignupClick = () => {
-    navigate('/signup'); // 3. 클릭 시 이동할 경로 설정
+    navigate('/signup');
+  };
+
+  // 로고 클릭 시 홈(/)으로 이동하는 함수
+  const handleLogoClick = () => {
+    navigate('/');
   };
 
   return (
@@ -18,7 +23,13 @@ const LoginPage = () => {
           <img src={logImg} alt="Login" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div className="rightForm">
-          <img src={donggukLogo} alt="Logo" style={{ width: '250px', marginBottom: '20px' }} />
+          {/* onClick 추가 및 클릭 가능한 표시(cursor) 추가 */}
+          <img 
+            src={donggukLogo} 
+            alt="Logo" 
+            onClick={handleLogoClick}
+            style={{ width: '250px', marginBottom: '20px', cursor: 'pointer' }} 
+          />
           <h1>역사를 걸으면 동국이 보이고<br />동국이 걸으면 역사가 된다.</h1>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
             <input type="text" placeholder="아이디" />

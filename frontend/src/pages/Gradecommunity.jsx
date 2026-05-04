@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import communityLogo from '../assets/community.png';
+import writeIcon from '../assets/write.png';
 
 const GradeBoard = () => {
-  useEffect(() => {
-  }, []);
+  const navigate = useNavigate();
+  const isLoggedIn = false; 
 
   return (
     <main className="main-container">
@@ -14,6 +16,11 @@ const GradeBoard = () => {
               <img src={communityLogo} alt="학년 게시판" className="header-icon-img" />
               <h2 className="board-title">학년 게시판</h2>
             </div>
+            {isLoggedIn && (
+              <div className="header-right" onClick={() => navigate('/gradewrite')}>
+                <img src={writeIcon} alt="글쓰기" className="header-icon-img clickable" />
+              </div>
+            )}
           </div>
           <div className="board-content">
           </div>
