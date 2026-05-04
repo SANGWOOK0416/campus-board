@@ -43,14 +43,23 @@
   justify-content: center;
 }
 
+.rightForm form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .rightForm input {
+  width: 100%;
   padding: 12px;
   margin-bottom: 10px;
   border: 1px solid var(--gray-border);
   border-radius: 5px;
+  box-sizing: border-box;
 }
 
 .btnPrimary {
+  width: 100%;
   border: 1px solid var(--gray-border);
   background: var(--orange-main);
   color: white;
@@ -58,13 +67,16 @@
   font-weight: bold;
   border-radius: 5px;
   margin-top: 10px;
+  box-sizing: border-box;
 }
 
 .btnGoogle {
+  width: 100%;
   border: 1px solid var(--gray-border);
   padding: 10px;
   border-radius: 5px;
   margin-top: 15px;
+  box-sizing: border-box;
 }
 
 h1 {

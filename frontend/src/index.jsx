@@ -1,20 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Auth0Provider } from '@auth0/auth0-react';
 import App from './App';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', color: 'red', fontFamily: 'monospace' }}>
+          <h2>앱 오류 발생</h2>
+          <pre>{this.state.error?.message}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <Auth0Provider
-      domain={import.meta.env.VITE_AUTH0_DOMAIN}
-      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-      authorizationParams={{
-        redirect_uri: import.meta.env.VITE_APP_URL || window.location.origin,
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-      }}
-    >
-      <App />
-    </Auth0Provider>
-  </React.StrictMode>
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
 );

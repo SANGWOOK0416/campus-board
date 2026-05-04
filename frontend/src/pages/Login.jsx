@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-import auth0 from 'auth0-js';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { syncUser } from '../api/auth';
 import './Login.css';
 import logImg from '../assets/logimg.jpg';
 import donggukLogo from '../assets/logo.png';
 
-const webAuth = new auth0.WebAuth({
-  domain: import.meta.env.VITE_AUTH0_DOMAIN,
-  clientID: import.meta.env.VITE_AUTH0_CLIENT_ID,
-  responseType: 'code',
-  audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-  scope: 'openid profile email',
-  redirectUri: import.meta.env.VITE_APP_URL || window.location.origin,
-});
-
 const LoginPage = () => {
-  const { isAuthenticated } = useAuth0();
+  const { loginWithPopup, isAuthenticated, getAccessTokenSilently, user } = useAuth0();
   const navigate = useNavigate();
+  const location = useLocation();
+  const signupSuccess = location.state?.signupSuccess;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,18 +21,31 @@ const LoginPage = () => {
     return null;
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    webAuth.login({
-      realm: 'Username-Password-Authentication',
-      username: email,
-      password: password,
-    }, (err) => {
+    try {
+      await loginWithPopup({
+        authorizationParams: {
+          login_hint: email,
+        },
+      });
+      // 로그인 성공 후 백엔드에 사용자 동기화
+      try {
+        const token = await getAccessTokenSilently();
+        await syncUser({ email: user?.email, name: user?.name }, token);
+      } catch (syncErr) {
+        console.warn('사용자 동기화 실패 (비필수):', syncErr.message);
+      }
+      navigate('/');
+    } catch (err) {
+      if (err.message !== 'Popup closed') {
+        setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      }
+    } finally {
       setLoading(false);
-      if (err) setError(err.description || '이메일 또는 비밀번호를 확인해주세요.');
-    });
+    }
   };
 
   return (
@@ -53,7 +59,7 @@ const LoginPage = () => {
           <h1>역사를 걸으면 동국이 보이고<br />동국이 걸으면 역사가 된다.</h1>
           <form onSubmit={handleLogin}>
             <input
-              type="email"
+              type="text"
               placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -64,11 +70,11 @@ const LoginPage = () => {
               placeholder="비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
+            {signupSuccess && <p style={{ color: 'green', fontSize: '0.85rem', margin: '4px 0' }}>회원가입이 완료되었습니다. 로그인해주세요.</p>}
             {error && <p style={{ color: 'red', fontSize: '0.85rem', margin: '4px 0' }}>{error}</p>}
             <button className="btnPrimary" type="submit" disabled={loading}>
-              {loading ? '로그인 중...' : '로그인'}
+              {loading ? 'Loading...' : 'Login'}
             </button>
           </form>
           <button className="btnGoogle" onClick={() => navigate('/signup')}>회원가입</button>
@@ -77,5 +83,4 @@ const LoginPage = () => {
     </div>
   );
 };
-
 export default LoginPage;

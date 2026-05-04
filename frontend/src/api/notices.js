@@ -1,9 +1,14 @@
-// TODO: axios import
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
-// getNotices(params) — 공지사항 목록 조회
-// @param {{ page?, limit?, source? }} params
-// TODO: GET /api/notices 요청 (params를 query string으로 전달)
+export const getNotices = async (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/api/notices?${query}`);
+  if (!res.ok) throw new Error('공지사항을 불러오는데 실패했습니다.');
+  return res.json();
+};
 
-// getNoticeById(id) — 공지사항 상세 조회
-// @param {string} id
-// TODO: GET /api/notices/:id 요청
+export const getNoticeById = async (id) => {
+  const res = await fetch(`${BASE_URL}/api/notices/${id}`);
+  if (!res.ok) throw new Error('공지사항을 불러오는데 실패했습니다.');
+  return res.json();
+};
