@@ -253,7 +253,7 @@ sequenceDiagram
     participant Server as Backend API & SSE
     participant DB as MongoDB Atlas
 
-    Note over User, DB: 📍 [Phase 1] Auth0 인증, 유저 동기화 및 SSE 연결
+    Note over User, DB:  [Phase 1] Auth0 인증, 유저 동기화 및 SSE 연결
     User->>FE: 로그인 요청
     FE->>Auth0: 인증 처리 및 JWT 발급
     Auth0-->>FE: JWT (Access Token) 반환
@@ -263,7 +263,7 @@ sequenceDiagram
     Server->>Server: sseManager에 클라이언트 등록 (addClient)
     Server-->>FE: 연결 성공 (text/event-stream) 및 Keep-alive 유지
 
-    Note over Cron, DB: 📍 [Phase 2] 공지사항 크롤링 자동화 및 실시간 Broadcast
+    Note over Cron, DB:  [Phase 2] 공지사항 크롤링 자동화 및 실시간 Broadcast
     Cron->>Crawler: 매일 오전 8시 크롤러 실행 트리거
     Crawler->>DB: 기존 공지 존재 여부 확인 (findOne by list_no)
     alt 새로운 공지사항일 경우
@@ -275,7 +275,7 @@ sequenceDiagram
         Crawler->>DB: 조회수(view_count) 및 수정일자만 Update
     end
 
-    Note over User, DB: 📍 [Phase 3] 게시판 로직 (데이터 정합성 및 동시성 제어)
+    Note over User, DB:  [Phase 3] 게시판 로직 (데이터 정합성 및 동시성 제어)
     User->>FE: 게시글 작성 요청
     FE->>Server: POST /api/posts
     Server->>DB: Mongoose ObjectId 검증 후 Insert (is_deleted: false)
@@ -291,7 +291,7 @@ sequenceDiagram
     FE->>Server: DELETE /api/posts/{id}
     Server->>DB: is_deleted: true 변경 (Soft Delete)
 
-    Note over User, DB: 📍 [Phase 4] 유저 인터랙션 및 타겟팅 알림
+    Note over User, DB:  [Phase 4] 유저 인터랙션 및 타겟팅 알림
     actor UserB as 다른 사용자
     UserB->>Server: 게시글에 댓글 작성 (POST /api/comments)
     Server->>DB: 댓글 저장 및 post_id 관계 매핑
