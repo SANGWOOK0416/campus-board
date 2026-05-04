@@ -35,13 +35,44 @@ const extractListNo = (href) => {
   }
 };
 
-// 상세 페이지에서 본문 텍스트 추출
+// 상세 페이지에서 HTML 추출 및 정제 (테이블 등 서식 보존)
 const fetchContent = async (url) => {
   try {
     const res = await axios.get(url, { timeout: 10000, headers: HTTP_HEADERS });
     const $ = cheerio.load(res.data);
-    const content = $('.board_view .cont').text().replace(/\s+/g, ' ').trim();
-    return content.substring(0, 1000);
+    const $cont = $('.board_view .cont');
+    if (!$cont.length) return '';
+
+    // 위험 요소 제거
+    $cont.find('script, style, iframe, object, embed, form').remove();
+
+    // 이벤트 속성 제거 (onclick, onerror 등)
+    $cont.find('*').each((_, el) => {
+      const attrs = Object.keys(el.attribs || {});
+      attrs.forEach(attr => {
+        if (attr.startsWith('on')) $(el).removeAttr(attr);
+      });
+    });
+
+    // 이미지 src 절대 경로로 변환
+    $cont.find('img').each((_, el) => {
+      const src = $(el).attr('src') || '';
+      if (src && !src.startsWith('http')) {
+        $(el).attr('src', BASE_URL + (src.startsWith('/') ? src : '/' + src));
+      }
+    });
+
+    // 링크 href 절대 경로로 변환 및 새 탭 열기
+    $cont.find('a').each((_, el) => {
+      const href = $(el).attr('href') || '';
+      if (href && !href.startsWith('http') && !href.startsWith('mailto:')) {
+        $(el).attr('href', BASE_URL + (href.startsWith('/') ? href : '/' + href));
+      }
+      $(el).attr('target', '_blank');
+      $(el).attr('rel', 'noopener noreferrer');
+    });
+
+    return $cont.html() || '';
   } catch {
     return '';
   }
@@ -106,4 +137,4 @@ const parseNotices = async (target) => {
   }
 };
 
-module.exports = { parseNotices, CRAWL_TARGETS };
+module.exports = { parseNotices, fetchContent, CRAWL_TARGETS };

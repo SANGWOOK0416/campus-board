@@ -1,23 +1,49 @@
-// TODO: axios import
-// TODO: 인증이 필요한 요청에 Authorization 헤더를 자동으로 추가하는
-//       axios 인스턴스(interceptor) 설정
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
-// getPosts(params) — 게시글 목록 조회
-// @param {{ page?, limit? }} params
-// TODO: GET /api/posts 요청 (params를 query string으로 전달)
+export const getPosts = async (params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/api/posts?${query}`);
+  if (!res.ok) throw new Error('게시글을 불러오는데 실패했습니다.');
+  return res.json();
+};
 
-// createPost(data) — 게시글 작성 (인증 필요)
-// @param {{ title, content }} data
-// TODO: POST /api/posts 요청 (Authorization 헤더 포함)
+export const getPostById = async (id) => {
+  const res = await fetch(`${BASE_URL}/api/posts/${id}`);
+  if (!res.ok) throw new Error('게시글을 불러오는데 실패했습니다.');
+  return res.json();
+};
 
-// getPostById(id) — 게시글 상세 조회
-// @param {string} id
-// TODO: GET /api/posts/:id 요청
+export const createPost = async (data, token) => {
+  const res = await fetch(`${BASE_URL}/api/posts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('게시글 작성에 실패했습니다.');
+  return res.json();
+};
 
-// updatePost(id, data) — 게시글 수정 (인증 필요)
-// @param {string} id, {{ title?, content? }} data
-// TODO: PATCH /api/posts/:id 요청 (Authorization 헤더 포함)
+export const addComment = async (postId, content, token) => {
+  const res = await fetch(`${BASE_URL}/api/posts/${postId}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ content }),
+  });
+  if (!res.ok) throw new Error('댓글 작성에 실패했습니다.');
+  return res.json();
+};
 
-// deletePost(id) — 게시글 삭제 (인증 필요)
-// @param {string} id
-// TODO: DELETE /api/posts/:id 요청 (Authorization 헤더 포함)
+export const toggleLike = async (postId, token) => {
+  const res = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('좋아요 처리에 실패했습니다.');
+  return res.json();
+};

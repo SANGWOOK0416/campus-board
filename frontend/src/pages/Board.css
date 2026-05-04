@@ -1,0 +1,252 @@
+/* ===== 게시판 목록 ===== */
+.board-table-wrap {
+  flex: 1;
+  overflow: hidden;
+}
+
+.board-status {
+  padding: 60px 20px;
+  text-align: center;
+  color: #bbb;
+  font-size: 0.95rem;
+}
+
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.board-table thead tr {
+  background: #fff8f5;
+  border-bottom: 2px solid #ff6b00;
+}
+
+.board-table th {
+  padding: 13px 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #555;
+  letter-spacing: 0.02em;
+}
+
+.board-table th:first-child { text-align: left; }
+.board-table th:not(:first-child) { text-align: center; }
+
+.board-table tbody tr {
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.board-table tbody tr:hover { background: #fff8f5; }
+
+.board-table td {
+  padding: 13px 20px;
+  font-size: 0.9rem;
+}
+
+.board-table td.col-title {
+  color: #222;
+  font-weight: 500;
+}
+
+.board-table td.col-center {
+  text-align: center;
+  color: #999;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.notice-badge {
+  display: inline-block;
+  background: #ff6b00;
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ===== 페이지네이션 ===== */
+.board-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.board-pagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #555;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.board-pagination button:hover:not(:disabled) {
+  border-color: #ff6b00;
+  color: #ff6b00;
+}
+
+.board-pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.board-pagination .page-info {
+  font-size: 0.88rem;
+  color: #888;
+  padding: 0 10px;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* ===== 게시글 상세 ===== */
+.detail-meta {
+  padding: 24px 28px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  line-height: 1.55;
+}
+
+.detail-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-info-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.detail-info-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.875rem;
+}
+
+.detail-info-item .label { color: #bbb; }
+.detail-info-item .value { color: #555; font-weight: 500; }
+
+.detail-views {
+  font-size: 0.82rem;
+  color: #ccc;
+}
+
+.detail-body {
+  flex: 1;
+  padding: 28px;
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: #333;
+  white-space: pre-wrap;
+  min-height: 280px;
+}
+
+/* HTML 렌더링 콘텐츠 (공지사항 상세) */
+.detail-body-html {
+  white-space: normal;
+  overflow-x: auto;
+}
+
+.detail-body-html table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.detail-body-html table th,
+.detail-body-html table td {
+  border: 1px solid #ddd;
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.detail-body-html table th {
+  background: #fff8f5;
+  font-weight: 600;
+  color: #555;
+}
+
+.detail-body-html table tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+.detail-body-html img {
+  max-width: 100%;
+  height: auto;
+}
+
+.detail-body-html p {
+  margin: 0 0 8px 0;
+}
+
+.detail-body-html a {
+  color: #ff6b00;
+  text-decoration: none;
+}
+
+.detail-body-html a:hover {
+  text-decoration: underline;
+}
+
+/* 원문 보기 버튼 */
+.source-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  background: #ff6b00;
+  color: white !important;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.source-btn:hover { opacity: 0.88; }
+
+/* 뒤로가기 버튼 */
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: none;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #ff6b00;
+  transition: all 0.15s;
+}
+
+.back-btn:hover {
+  background: #fff5ed;
+  border-color: #ffb87a;
+}

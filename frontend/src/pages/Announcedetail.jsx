@@ -1,47 +1,76 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import announceLogo from '../assets/announce.png';
 import { FaReply } from 'react-icons/fa';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import './Board.css';
 
 const AnnounceDetail = () => {
-  const [liked, setLiked] = useState(false);
-  const data = {
-    title: "공지사항 제목",
-    author: "관리자",
-    date: "2024.05.20",
-    content: "공지사항 내용입니다.",
-    filename: "notice.pdf"
+  const location = useLocation();
+  const notice = location.state?.notice;
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
   };
+
+  if (!notice) {
+    return (
+      <main className="main-container">
+        <div className="board-card large">
+          <div className="board-header">
+            <div className="header-left">
+              <img src={announceLogo} alt="공지사항" className="header-icon-img" />
+              <h2 className="board-title">공지사항</h2>
+            </div>
+            <button className="back-btn" onClick={() => window.history.back()}>
+              <FaReply style={{ transform: 'scaleX(-1)' }} />
+            </button>
+          </div>
+          <p className="board-status">공지사항을 찾을 수 없습니다.</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="main-container">
       <div className="board-card large">
-        <div className="board-header detail-header">
+        <div className="board-header">
           <div className="header-left">
-            <img src={announceLogo} alt="icon" className="header-icon-img" />
+            <img src={announceLogo} alt="공지사항" className="header-icon-img" />
             <h2 className="board-title">공지사항</h2>
           </div>
-          <button className="back-button" onClick={() => window.history.back()} style={{background:'none', border:'none', cursor:'pointer'}}>
-             <FaReply style={{ transform: 'scaleX(-1)', color: '#ff6b00' }} />
+          <button className="back-btn" onClick={() => window.history.back()}>
+            <FaReply style={{ transform: 'scaleX(-1)' }} />
           </button>
         </div>
-        <div className="post-meta" style={{padding:'20px', borderBottom:'1px solid #eee'}}>
-          <div><strong>제목 :</strong> {data.title}</div>
-          <div style={{display:'flex', justifyContent:'space-between', marginTop:'10px'}}>
-            <span><strong>작성자 :</strong> {data.author}</span>
-            <span><strong>작성일 :</strong> {data.date}</span>
+
+        <div className="detail-meta">
+          <h3 className="detail-title">{notice.title}</h3>
+          <div className="detail-info-row">
+            <div className="detail-info-left">
+              <div className="detail-info-item">
+                <span className="label">작성자</span>
+                <span className="value">{notice.author}</span>
+              </div>
+              <div className="detail-info-item">
+                <span className="label">작성일</span>
+                <span className="value">{formatDate(notice.created_at)}</span>
+              </div>
+            </div>
+            {notice.view_count !== undefined && (
+              <span className="detail-views">조회 {notice.view_count.toLocaleString()}</span>
+            )}
           </div>
         </div>
-        <div className="board-content" style={{flex: 1, padding: '24px', display: 'flex', flexDirection: 'column'}}>
-          <div style={{border:'1px solid #eee', borderRadius:'10px', padding:'20px', flex: 1}}>
-            {data.content}
-          </div>
-        </div>
-        <div className="footer" style={{padding:'20px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-          <div><strong>첨부파일 :</strong> {data.filename}</div>
-          <button className="like-button" onClick={() => setLiked(!liked)}>
-            {liked ? <AiFillHeart /> : <AiOutlineHeart />}
-          </button>
+
+        <div className="detail-body detail-body-html" dangerouslySetInnerHTML={{ __html: notice.content }} />
+
+        <div className="footer">
+          <span />
+          <a href={notice.source_url} target="_blank" rel="noreferrer" className="source-btn">
+            원문 보기
+          </a>
         </div>
       </div>
     </main>

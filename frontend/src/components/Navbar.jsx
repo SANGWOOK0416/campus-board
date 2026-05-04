@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import './Navbar.css';
 import logo from '../assets/logo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, logout } = useAuth0();
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
+
+  const handleLogout = () => {
+    logout({ logoutParams: { returnTo: window.location.origin } });
+    closeMenu();
+  };
 
   return (
     <nav className="navbar">
@@ -22,7 +28,11 @@ const Navbar = () => {
           <Link to="/majorcommunity"><span>전공 게시판</span></Link>
           <Link to="/gradecommunity"><span>학년 게시판</span></Link>
           <Link to="/mypage"><span>마이 페이지</span></Link>
-          <Link to="/login"><button className="loginBtn">{isLoggedIn ? 'Logout' : 'Login'}</button></Link>
+          {isAuthenticated ? (
+            <button className="loginBtn" onClick={handleLogout}>Logout</button>
+          ) : (
+            <Link to="/login"><button className="loginBtn">Login</button></Link>
+          )}
         </div>
 
         <button className="hamburger" onClick={toggleMenu}>
@@ -40,10 +50,13 @@ const Navbar = () => {
             <Link to="/gradecommunity" onClick={closeMenu}><span>학년 게시판</span></Link>
             <Link to="/mypage" onClick={closeMenu}><span>마이 페이지</span></Link>
           </div>
-          <Link to="/login" onClick={closeMenu}>
-            {/* 로그인 여부에 따라 텍스트 변경 */}
-            <button className="mobileLoginBtn">{isLoggedIn ? 'Logout' : 'Login'}</button>
-          </Link>
+          {isAuthenticated ? (
+            <button className="mobileLoginBtn" onClick={handleLogout}>Logout</button>
+          ) : (
+            <Link to="/login" onClick={closeMenu}>
+              <button className="mobileLoginBtn">Login</button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>
