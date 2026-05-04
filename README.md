@@ -559,46 +559,46 @@ const authMiddleware = (req, res, next) => {
 
 | 테스트 케이스 | 입력 | 기대 결과 | 실제 결과 |
 |--------------|------|-----------|-----------|
-| 정상 동기화 | 유효한 JWT + `{ student_id, major, name }` | 201 Created, user 객체 반환 | ✅ 통과 |
-| 중복 로그인 | 동일 auth0_id로 재요청 | 201 Created, Upsert (데이터 갱신) | ✅ 통과 |
-| 인증 없이 요청 | Authorization 헤더 없음 | 401 Unauthorized | ✅ 통과 |
+| 정상 동기화 | 유효한 JWT + `{ student_id, major, name }` | 201 Created, user 객체 반환 |  통과 |
+| 중복 로그인 | 동일 auth0_id로 재요청 | 201 Created, Upsert (데이터 갱신) |  통과 |
+| 인증 없이 요청 | Authorization 헤더 없음 | 401 Unauthorized |  통과 |
 
 #### 게시글 CRUD 테스트
 
 | 테스트 케이스 | 입력 | 기대 결과 | 실제 결과 |
 |--------------|------|-----------|-----------|
-| 게시글 작성 | 유효 JWT + `{ title, content, board_id }` | 201 Created | ✅ 통과 |
-| 게시글 목록 조회 | GET /api/posts | 200 OK, posts 배열 반환 | ✅ 통과 |
-| Soft Delete | 작성자 JWT + DELETE /api/posts/:id | 204 No Content | ✅ 통과 |
-| 타인 게시글 삭제 시도 | 다른 유저 JWT + DELETE /api/posts/:id | 403 Forbidden | ✅ 통과 |
-| 삭제 후 목록 조회 | GET /api/posts | 삭제된 게시글 미노출 | ✅ 통과 |
+| 게시글 작성 | 유효 JWT + `{ title, content, board_id }` | 201 Created |  통과 |
+| 게시글 목록 조회 | GET /api/posts | 200 OK, posts 배열 반환 |  통과 |
+| Soft Delete | 작성자 JWT + DELETE /api/posts/:id | 204 No Content |  통과 |
+| 타인 게시글 삭제 시도 | 다른 유저 JWT + DELETE /api/posts/:id | 403 Forbidden |  통과 |
+| 삭제 후 목록 조회 | GET /api/posts | 삭제된 게시글 미노출 |  통과 |
 
 #### 좋아요 동시성 테스트
 
 | 테스트 케이스 | 입력 | 기대 결과 | 실제 결과 |
 |--------------|------|-----------|-----------|
-| 좋아요 추가 | POST /api/posts/:id/like | 좋아요 배열에 유저 ID 추가 | ✅ 통과 |
-| 좋아요 중복 방지 | 동일 유저가 재클릭 | 배열에서 제거 (토글) | ✅ 통과 |
-| 동시 다중 요청 | 여러 유저가 동시에 좋아요 | $addToSet 원자 연산으로 정합성 유지 | ✅ 통과 |
+| 좋아요 추가 | POST /api/posts/:id/like | 좋아요 배열에 유저 ID 추가 |  통과 |
+| 좋아요 중복 방지 | 동일 유저가 재클릭 | 배열에서 제거 (토글) |  통과 |
+| 동시 다중 요청 | 여러 유저가 동시에 좋아요 | $addToSet 원자 연산으로 정합성 유지 |  통과 |
 
 #### SSE 실시간 알림 테스트
 
 | 테스트 케이스 | 기대 결과 | 실제 결과 |
 |--------------|-----------|-----------|
-| SSE 연결 수립 | `connected` 이벤트 수신 | ✅ 통과 |
-| 크롤러 실행 후 새 공지 | `new_notice` 이벤트 Broadcast | ✅ 통과 |
-| 다른 유저 댓글 작성 | 게시글 작성자에게만 `new_comment` 이벤트 | ✅ 통과 |
-| 본인 댓글 작성 | 본인에게 알림 미전송 | ✅ 통과 |
-| SSE 연결 종료 | Map에서 클라이언트 자동 제거 | ✅ 통과 |
+| SSE 연결 수립 | `connected` 이벤트 수신 |  통과 |
+| 크롤러 실행 후 새 공지 | `new_notice` 이벤트 Broadcast |  통과 |
+| 다른 유저 댓글 작성 | 게시글 작성자에게만 `new_comment` 이벤트 |  통과 |
+| 본인 댓글 작성 | 본인에게 알림 미전송 |  통과 |
+| SSE 연결 종료 | Map에서 클라이언트 자동 제거 |  통과 |
 
 ### 5.3 엣지 케이스 테스트
 
 | 테스트 케이스 | 기대 결과 | 실제 결과 |
 |--------------|-----------|-----------|
-| 만료된 JWT로 요청 | 401 Unauthorized | ✅ 통과 |
-| 존재하지 않는 post_id | 404 Not Found | ✅ 통과 |
-| 이미 크롤링된 공지 재수집 | view_count만 갱신, 중복 저장 없음 | ✅ 통과 |
-| 동일 (post_id + user_id) 좋아요 재시도 | 토글(제거) 처리 | ✅ 통과 |
+| 만료된 JWT로 요청 | 401 Unauthorized |  통과 |
+| 존재하지 않는 post_id | 404 Not Found |  통과 |
+| 이미 크롤링된 공지 재수집 | view_count만 갱신, 중복 저장 없음 |  통과 |
+| 동일 (post_id + user_id) 좋아요 재시도 | 토글(제거) 처리 |  통과 |
 
 ---
 
