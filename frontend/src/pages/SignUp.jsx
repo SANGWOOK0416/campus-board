@@ -56,6 +56,10 @@ const SignupPage = () => {
     }
   };
 
+  const goToHome = () => {
+    navigate('/');
+  };
+
   return (
     <div className="loginContainer">
       <div className="whiteBox">
@@ -64,7 +68,12 @@ const SignupPage = () => {
         </div>
 
         <div className="rightForm">
-          <img src={donggukLogo} alt="Logo" style={{ width: '250px', marginBottom: '20px' }} />
+          <img
+            src={donggukLogo}
+            alt="Logo"
+            onClick={goToHome}
+            style={{ width: '250px', marginBottom: '20px', cursor: 'pointer' }}
+          />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
             <input
