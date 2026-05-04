@@ -42,10 +42,6 @@ const LoginPage = () => {
     });
   };
 
-  const handleSignup = () => {
-    webAuth.authorize({ screen_hint: 'signup' });
-  };
-
   return (
     <div className="loginContainer">
       <div className="whiteBox">
@@ -53,7 +49,7 @@ const LoginPage = () => {
           <img src={logImg} alt="로그인 이미지" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div className="rightForm">
-          <img src={donggukLogo} alt="로고 이미지" style={{ width: '300px' }} />
+          <img src={donggukLogo} alt="로고 이미지" style={{ width: '250px', marginBottom: '20px' }} />
           <h1>역사를 걸으면 동국이 보이고<br />동국이 걸으면 역사가 된다.</h1>
           <form onSubmit={handleLogin}>
             <input
@@ -75,7 +71,7 @@ const LoginPage = () => {
               {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
-          <button className="btnGoogle" onClick={handleSignup}>회원가입</button>
+          <button className="btnGoogle" onClick={() => navigate('/signup')}>회원가입</button>
         </div>
       </div>
     </div>
