@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import communityLogo from '../assets/community.png';
+import writeIcon from '../assets/write.png';
 import { getPosts } from '../api/posts';
 import './Board.css';
 
@@ -11,6 +13,7 @@ const GradeBoard = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth0();
 
   useEffect(() => {
     setLoading(true);
@@ -40,6 +43,11 @@ const GradeBoard = () => {
               <img src={communityLogo} alt="학년 게시판" className="header-icon-img" />
               <h2 className="board-title">학년 게시판</h2>
             </div>
+            {isAuthenticated && (
+              <div className="header-right" onClick={() => navigate('/gradewrite')}>
+                <img src={writeIcon} alt="글쓰기" className="header-icon-img clickable" />
+              </div>
+            )}
           </div>
 
           <div className="board-table-wrap">

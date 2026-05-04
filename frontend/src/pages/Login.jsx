@@ -21,6 +21,10 @@ const LoginPage = () => {
     return null;
   }
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -31,7 +35,6 @@ const LoginPage = () => {
           login_hint: email,
         },
       });
-      // 로그인 성공 후 백엔드에 사용자 동기화
       try {
         const token = await getAccessTokenSilently();
         await syncUser({ email: user?.email, name: user?.name }, token);
@@ -55,7 +58,12 @@ const LoginPage = () => {
           <img src={logImg} alt="로그인 이미지" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div className="rightForm">
-          <img src={donggukLogo} alt="로고 이미지" style={{ width: '250px', marginBottom: '20px' }} />
+          <img
+            src={donggukLogo}
+            alt="로고 이미지"
+            onClick={handleLogoClick}
+            style={{ width: '250px', marginBottom: '20px', cursor: 'pointer' }}
+          />
           <h1>역사를 걸으면 동국이 보이고<br />동국이 걸으면 역사가 된다.</h1>
           <form onSubmit={handleLogin}>
             <input
@@ -83,4 +91,5 @@ const LoginPage = () => {
     </div>
   );
 };
+
 export default LoginPage;

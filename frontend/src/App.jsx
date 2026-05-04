@@ -11,8 +11,10 @@ import Announce from './pages/Announce';
 import AnnDetail from './pages/Announcedetail';
 import Majorcommunity from './pages/Majorcommunity';
 import MajDetail from './pages/Majordetail';
+import MajWrite from './pages/Majorwrite';
 import Gradecommunity from './pages/Gradecommunity';
 import GraDetail from './pages/Gradedetail';
+import GraWrite from './pages/Gradewrite';
 import Written from "./pages/Writtenpage";
 import WriDetail from './pages/Wridetail';
 import WrittenComment from "./pages/WrittenCommentpage";
@@ -71,8 +73,10 @@ function AppContent() {
         <Route path="/anndetail" element={<AnnDetail />} />
         <Route path="/majorcommunity" element={<Majorcommunity />} />
         <Route path="/majdetail" element={<MajDetail />} />
+        <Route path="/majorwrite" element={<MajWrite />} />
         <Route path="/gradecommunity" element={<Gradecommunity />} />
         <Route path="/gradetail" element={<GraDetail />} />
+        <Route path="/gradewrite" element={<GraWrite />} />
         <Route path="/written" element={<Written />} />
         <Route path="/wridetail" element={<WriDetail />} />
         <Route path="/writtencomment" element={<WrittenComment />} />
