@@ -87,7 +87,7 @@
 
 ### 3.1 클래스 다이어그램
 
-![image](https://github.com/yang6408/campus-board/blob/main/docs/클래스%20다이어그램.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/class.png)
 
 #### 컬렉션 스키마 상세
 
