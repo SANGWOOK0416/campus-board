@@ -85,68 +85,9 @@
 
 ## 3. 설계
 
-### 3.1 데이터베이스 설계 (클래스 다이어그램)
+### 3.1 클래스 다이어그램
 
-MongoDB를 사용하며 Mongoose ODM으로 스키마를 정의한다. 컬렉션 간의 연관 관계는 `ObjectId`를 활용한 참조(Reference) 방식으로 설계하였으며, 게시글 및 댓글 컬렉션에는 데이터 복구 가능성을 고려하여 물리적 삭제 대신 Soft Delete 방식을 적용하였다.
-
-```mermaid
-classDiagram
-    class User {
-        +ObjectId _id
-        +String auth0_id
-        +String student_id
-        +String name
-        +Number grade
-        +String major
-        +String email
-        +String role
-        +Date created_at
-    }
-    class Post {
-        +ObjectId _id
-        +ObjectId board_id
-        +ObjectId user_id
-        +String title
-        +String content
-        +Number view_count
-        +Number like_count
-        +Boolean is_deleted
-        +Date created_at
-        +Date updated_at
-    }
-    class Notice {
-        +ObjectId _id
-        +Number list_no
-        +String title
-        +String content
-        +String author
-        +Number view_count
-        +String source_url
-        +Boolean is_pinned
-        +Date crawled_at
-    }
-    class Comment {
-        +ObjectId _id
-        +ObjectId post_id
-        +ObjectId user_id
-        +String content
-        +Boolean is_deleted
-        +Date created_at
-        +Date updated_at
-    }
-    class Like {
-        +ObjectId _id
-        +ObjectId post_id
-        +ObjectId user_id
-        +Date created_at
-    }
-
-    User "1" -- "N" Post : 작성 (writes)
-    User "1" -- "N" Comment : 작성 (writes)
-    User "1" -- "N" Like : 클릭 (clicks)
-    Post "1" -- "N" Comment : 포함 (contains)
-    Post "1" -- "N" Like : 받음 (receives)
-```
+![image](https://github.com/yang6408/campus-board/blob/main/docs/클래스%20다이어그램.png)
 
 #### 컬렉션 스키마 상세
 
