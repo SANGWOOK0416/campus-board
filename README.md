@@ -541,6 +541,17 @@ const authMiddleware = (req, res, next) => {
 | 이미 크롤링된 공지 재수집 | view_count만 갱신, 중복 저장 없음 |  통과 |
 | 동일 (post_id + user_id) 좋아요 재시도 | 토글(제거) 처리 |  통과 |
 
+![image](https://github.com/yang6408/campus-board/blob/main/docs/1.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/2.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/3.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/4.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/5.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/6.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/7.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/8.png)
+![image](https://github.com/yang6408/campus-board/blob/main/docs/9.png)
+
+
 ---
 
 ## 6. 결론
