@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import communityLogo from '../assets/community.png';
 import { FaReply, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import { createPost } from '../api/posts';
 
-const GradeDetail = () => {
+const GradeWrite = () => {
   const navigate = useNavigate();
-  
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const { getAccessTokenSilently, user } = useAuth0();
+
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [fileList, setFileList] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [date, setDate] = useState("");
-
-  const author = "학생";
+  const [date, setDate] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const today = new Date();
@@ -33,9 +36,24 @@ const GradeDetail = () => {
     setFileList((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    console.log("제출 데이터:", { title, content, fileList, date });
-    alert("게시글이 등록되었습니다.");
+  const handleSubmit = async () => {
+    if (!title.trim()) { setError('제목을 입력해주세요.'); return; }
+    if (!content.trim()) { setError('내용을 입력해주세요.'); return; }
+
+    setLoading(true);
+    setError('');
+    try {
+      const token = await getAccessTokenSilently({
+        authorizationParams: { audience: import.meta.env.VITE_AUTH0_AUDIENCE },
+      });
+      await createPost({ title, content, board_id: 'grade' }, token);
+      alert('게시글이 등록되었습니다.');
+      navigate('/gradecommunity');
+    } catch (err) {
+      setError('게시글 등록에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,29 +65,29 @@ const GradeDetail = () => {
             <h2 className="board-title">학년 게시판</h2>
           </div>
           <button className="back-button" onClick={() => navigate(-1)}>
-             <FaReply style={{ transform: 'scaleX(-1)' }} />
+            <FaReply style={{ transform: 'scaleX(-1)' }} />
           </button>
         </div>
 
         <div className="post-meta">
           <div className="meta-title-row">
-            <strong>제목 :</strong> 
-            <input 
-              type="text" 
+            <strong>제목 :</strong>
+            <input
+              type="text"
               className="meta-title-input"
-              value={title} 
+              value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="제목을 입력하세요" 
+              placeholder="제목을 입력하세요"
             />
           </div>
           <div className="meta-info-row">
-            <span><strong>작성자 :</strong> {author}</span>
+            <span><strong>작성자 :</strong> {user?.name || '학생'}</span>
             <span><strong>작성일 :</strong> {date}</span>
           </div>
         </div>
 
         <div className="board-content">
-          <textarea 
+          <textarea
             className="content-textarea"
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -77,9 +95,11 @@ const GradeDetail = () => {
           />
         </div>
 
+        {error && <p style={{ color: 'red', fontSize: '0.85rem', padding: '0 16px' }}>{error}</p>}
+
         <div className="footer">
           <div className="footer-left">
-            <div 
+            <div
               className={`dropzone ${isDragging ? 'dragging' : ''}`}
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
@@ -87,7 +107,7 @@ const GradeDetail = () => {
             >
               <span>파일을 이곳에 드래그하여 추가하세요</span>
             </div>
-            
+
             {fileList.length > 0 && (
               <div className="file-list">
                 {fileList.map((file, index) => (
@@ -101,8 +121,8 @@ const GradeDetail = () => {
           </div>
 
           <div className="footer-right">
-            <button className="submit-post-btn" onClick={handleSubmit}>
-              게시하기
+            <button className="submit-post-btn" onClick={handleSubmit} disabled={loading}>
+              {loading ? '등록 중...' : '게시하기'}
             </button>
           </div>
         </div>
@@ -111,4 +131,4 @@ const GradeDetail = () => {
   );
 };
 
-export default GradeDetail;
+export default GradeWrite;

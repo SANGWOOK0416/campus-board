@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import communityLogo from '../assets/community.png';
 import { FaReply } from 'react-icons/fa';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
-import { addComment, toggleLike } from '../api/posts';
+import { addComment, toggleLike, getComments } from '../api/posts';
 import './Board.css';
 
 const MajorDetail = () => {
@@ -17,6 +17,12 @@ const MajorDetail = () => {
   const [likeCount, setLikeCount] = useState(post?.like_count || 0);
   const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    if (!post?._id) return;
+    getComments(post._id).then(setComments).catch(() => {});
+  }, [post?._id]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -26,12 +32,15 @@ const MajorDetail = () => {
   const handleLike = async () => {
     if (!isAuthenticated) { navigate('/login'); return; }
     try {
-      const token = await getAccessTokenSilently();
+      const token = await getAccessTokenSilently({
+        authorizationParams: { audience: import.meta.env.VITE_AUTH0_AUDIENCE },
+      });
       const res = await toggleLike(post._id, token);
       setLiked(!liked);
       setLikeCount(res.like_count);
     } catch (e) {
-      console.error(e);
+      console.error('좋아요 실패:', e);
+      alert('좋아요 처리에 실패했습니다: ' + e.message);
     }
   };
 
@@ -39,12 +48,17 @@ const MajorDetail = () => {
     if (!comment.trim()) return;
     setSubmitting(true);
     try {
-      const token = await getAccessTokenSilently();
+      const token = await getAccessTokenSilently({
+        authorizationParams: { audience: import.meta.env.VITE_AUTH0_AUDIENCE },
+      });
       await addComment(post._id, comment, token);
       setComment('');
+      const updated = await getComments(post._id);
+      setComments(updated);
       alert('댓글이 등록되었습니다.');
     } catch (e) {
-      alert('댓글 등록에 실패했습니다.');
+      console.error('댓글 실패:', e);
+      alert('댓글 등록에 실패했습니다: ' + e.message);
     } finally {
       setSubmitting(false);
     }
@@ -112,6 +126,17 @@ const MajorDetail = () => {
         </div>
 
         <div className="comment-wrapper">
+          {comments.length > 0 && (
+            <div className="comment-list">
+              {comments.map(c => (
+                <div key={c._id} className="comment-item">
+                  <span className="comment-author">{c.user_id?.name || '익명'}</span>
+                  <span className="comment-date">{formatDate(c.created_at)}</span>
+                  <p className="comment-content">{c.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
           {isAuthenticated ? (
             <div className="comment-input-container">
               <textarea

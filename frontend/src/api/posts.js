@@ -7,6 +7,15 @@ export const getPosts = async (params = {}) => {
   return res.json();
 };
 
+export const getMyPosts = async (token, params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/api/posts/my?${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('내 게시글을 불러오는데 실패했습니다.');
+  return res.json();
+};
+
 export const getPostById = async (id) => {
   const res = await fetch(`${BASE_URL}/api/posts/${id}`);
   if (!res.ok) throw new Error('게시글을 불러오는데 실패했습니다.');
@@ -23,6 +32,30 @@ export const createPost = async (data, token) => {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('게시글 작성에 실패했습니다.');
+  return res.json();
+};
+
+export const getMyComments = async (token, params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/api/posts/my/comments?${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('내 댓글을 불러오는데 실패했습니다.');
+  return res.json();
+};
+
+export const getMyLikes = async (token, params = {}) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`${BASE_URL}/api/posts/my/likes?${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('좋아요 목록을 불러오는데 실패했습니다.');
+  return res.json();
+};
+
+export const getComments = async (postId) => {
+  const res = await fetch(`${BASE_URL}/api/posts/${postId}/comments`);
+  if (!res.ok) throw new Error('댓글을 불러오는데 실패했습니다.');
   return res.json();
 };
 

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
+import { syncUser } from './api/auth';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -33,6 +34,7 @@ function Auth0ProviderWithNavigate({ children }) {
       authorizationParams={{
         redirect_uri: import.meta.env.VITE_APP_URL || window.location.origin,
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        scope: 'openid profile email',
       }}
       useRefreshTokens={true}
       cacheLocation="localstorage"
@@ -47,10 +49,20 @@ function Auth0ProviderWithNavigate({ children }) {
 
 function AppContent() {
   const location = useLocation();
-  const { isLoading, error } = useAuth0();
+  const { isLoading, error, isAuthenticated, user, getAccessTokenSilently } = useAuth0();
   const isLoginPage = location.pathname === '/login' || location.pathname === '/signup';
 
-  if (error) {
+  // 로그인 성공 후 user가 세팅되면 백엔드에 유저 동기화
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    getAccessTokenSilently({
+      authorizationParams: { audience: import.meta.env.VITE_AUTH0_AUDIENCE },
+    })
+      .then(token => syncUser({ email: user.email, name: user.name }, token))
+      .catch(err => console.warn('유저 동기화 실패 (비필수):', err.message));
+  }, [isAuthenticated, user]);
+
+  if (error && error.message !== 'Popup closed') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', gap: '16px' }}>
         <p style={{ color: 'red' }}>인증 오류: {error.message}</p>
